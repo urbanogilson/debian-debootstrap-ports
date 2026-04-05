@@ -1,4 +1,5 @@
 name: actions
+
 on:
   push:
     paths:
@@ -7,6 +8,13 @@ on:
   schedule:
     - cron: '0 0 15 * *'
   workflow_dispatch:
+
+concurrency:
+  group: debian-debootstrap-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 env:
   DEBIAN_FRONTEND: noninteractive
@@ -20,26 +28,64 @@ jobs:
       matrix:
         VERSION: [sid]
         include:
-          - {ARCH: alpha,   QEMU_ARCH: alpha,       UNAME_ARCH: alpha,   CONTAINER_ARCH: alpha,   VERSION: sid}
-          - {ARCH: hppa,    QEMU_ARCH: hppa,        UNAME_ARCH: hppa,    CONTAINER_ARCH: hppa,    VERSION: sid}
-          - {ARCH: loong64, QEMU_ARCH: loongarch64, UNAME_ARCH: loong64, CONTAINER_ARCH: loong64, VERSION: sid}
-          - {ARCH: m68k,    QEMU_ARCH: m68k,        UNAME_ARCH: m68k,    CONTAINER_ARCH: m68k,    VERSION: sid}
-          - {ARCH: powerpc, QEMU_ARCH: ppc,         UNAME_ARCH: powerpc, CONTAINER_ARCH: ppc,     VERSION: sid}
-          - {ARCH: ppc64,   QEMU_ARCH: ppc64,       UNAME_ARCH: ppc64,   CONTAINER_ARCH: ppc64,   VERSION: sid}
-          - {ARCH: riscv64, QEMU_ARCH: riscv64,     UNAME_ARCH: riscv64, CONTAINER_ARCH: riscv64, VERSION: sid}
-          - {ARCH: sh4,     QEMU_ARCH: sh4,         UNAME_ARCH: sh4,     CONTAINER_ARCH: sh4,     VERSION: sid}
-          - {ARCH: sparc64, QEMU_ARCH: sparc64,     UNAME_ARCH: sparc64, CONTAINER_ARCH: sparc64, VERSION: sid}
+          - ARCH: alpha
+            QEMU_ARCH: alpha
+            UNAME_ARCH: alpha
+            CONTAINER_ARCH: alpha
+          - ARCH: hppa
+            QEMU_ARCH: hppa
+            UNAME_ARCH: hppa
+            CONTAINER_ARCH: hppa
+          - ARCH: loong64
+            QEMU_ARCH: loongarch64
+            UNAME_ARCH: loong64
+            CONTAINER_ARCH: loong64
+          - ARCH: m68k
+            QEMU_ARCH: m68k
+            UNAME_ARCH: m68k
+            CONTAINER_ARCH: m68k
+          - ARCH: powerpc
+            QEMU_ARCH: ppc
+            UNAME_ARCH: powerpc
+            CONTAINER_ARCH: ppc
+          - ARCH: ppc64
+            QEMU_ARCH: ppc64
+            UNAME_ARCH: ppc64
+            CONTAINER_ARCH: ppc64
+          - ARCH: riscv64
+            QEMU_ARCH: riscv64
+            UNAME_ARCH: riscv64
+            CONTAINER_ARCH: riscv64
+          - ARCH: sh4
+            QEMU_ARCH: sh4
+            UNAME_ARCH: sh4
+            CONTAINER_ARCH: sh4
+          - ARCH: sparc64
+            QEMU_ARCH: sparc64
+            UNAME_ARCH: sparc64
+            CONTAINER_ARCH: sparc64
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Build
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Build and Push
         run: |
+          set -euxo pipefail
           sudo rm -f /var/lib/man-db/auto-update
           echo "man-db man-db/auto-update boolean false" | sudo debconf-set-selections
           sudo apt-get purge -y needrestart snapd || true
           sudo apt-get update
           sudo apt-get install -y qemu-user-static debootstrap
-          dpkg -L qemu-user-static | grep ${{ matrix.QEMU_ARCH }} || true
-          ls -alh /proc/sys/fs/binfmt_misc/ || true
           ./update.sh \
             -a ${{ matrix.ARCH }} \
             -c ${{ matrix.CONTAINER_ARCH }} \
@@ -47,11 +93,8 @@ jobs:
             -q ${{ matrix.QEMU_ARCH }} \
             -d ${{ env.DOCKER_REPO }} \
             -o ${{ matrix.UNAME_ARCH }}
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Publish Docker images
+            
+      - name: Push Docker images
         run: |
-          docker push -a ${{ env.DOCKER_REPO }}
+          set -euxo pipefail
+          docker push -a "${{ env.DOCKER_REPO }}"
