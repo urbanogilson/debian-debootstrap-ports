@@ -1,45 +1,59 @@
 # debian-debootstrap-ports
 
 [![actions](https://github.com/urbanogilson/debian-debootstrap-ports/actions/workflows/actions.yml/badge.svg?branch=main)](https://github.com/urbanogilson/debian-debootstrap-ports/actions/workflows/actions.yml)
- [![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/debian-debootstrap-ports)](https://hub.docker.com/r/urbanogilson/debian-debootstrap-ports)
-[![CI](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/urbanogilson/debian-debootstrap-ports/blob/main/LICENSE)
- 
- `debian-debootstrap-ports` Docker image for multiple architectures (ports)
+[![Docker Pulls](https://img.shields.io/docker/pulls/urbanogilson/debian-debootstrap-ports)](https://hub.docker.com/r/urbanogilson/debian-debootstrap-ports)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/urbanogilson/debian-debootstrap-ports/blob/main/LICENSE)
+
+Minimal Debian Docker images for architectures available only through [Debian Ports](https://www.debian.org/ports/) — built with `debootstrap` and QEMU user-mode emulation.
 
 ## Usage
 
-Before using this Docker image, you need to configure binfmt-support on your Docker host. This works both locally and remotely (e.g., using boot2docker or swarm).
+Enable multi-architecture support on your Docker host (required once):
 
 ```console
 $ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 ```
 
-Once configured, you can run a `powerpc` image from your `x86_64` Docker host.
+Then run any supported architecture from an `x86_64` host:
 
 ```console
-$ $ docker run -it --rm urbanogilson/debian-debootstrap-ports:powerpc-trixie-sid
-root@12c7a97fd7d8:/# uname -a
-Linux 12c7a97fd7d8 5.15.133.1-microsoft-standard-WSL2 #1 SMP Thu Oct 5 21:02:42 UTC 2023 ppc GNU/Linux
-root@12c7a97fd7d8:/#
+$ docker run -it --rm urbanogilson/debian-debootstrap-ports:powerpc-forky-sid
+root@urbanogilson:/# uname -a
+Linux urbanogilson 6.17.0-20-generic #20~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Thu Mar 19 01:28:37 UTC 2 ppc GNU/Linux
 ```
+
+## Image variants
+
+Each architecture is published in two variants:
+
+| Variant | Tag pattern | Description |
+|---------|-------------|-------------|
+| full | `ARCH-VERSION` | Includes `qemu-*-static` — runs on any x86_64 host without extra setup |
+| slim | `ARCH-VERSION-slim` | No QEMU binary — smaller, for use when binfmt is already registered on the host |
+
+Example tags: `m68k-trixie-sid`, `m68k-trixie-sid-slim`
 
 ## Supported ports
 
-Port            | Architecture          | Description
-| ------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-alpha           | Alpha	                | Port to the 64-bit RISC Alpha architecture.                                                                                                                                        |
-hppa            | HP PA-RISC            | Port to Hewlett-Packard's PA-RISC architecture.                                                                                                                                    |
-m68k            | Motorola 68k          | Port to the Motorola 68k series of processors — in particular, the Sun3 range of workstations, the Apple Macintosh personal computers, and the Atari and Amiga personal computers. |
-powerpc/ppc64   | Motorola/IBM PowerPC  | Port for many of the Apple Macintosh PowerMac models, and CHRP and PReP open architecture machines.                                                                                |
-sh4             | SuperH                | Port to Hitachi SuperH processors. Also supports the open source J-Core processor.                                                                                                 |
+| Port | Architecture | Endianness | Description |
+|------|-------------|------------|-------------|
+| `alpha` | Alpha 64-bit RISC | little | Port to the 64-bit RISC Alpha architecture. |
+| `hppa` | HP PA-RISC | big | Port to Hewlett-Packard's PA-RISC architecture. |
+| `loong64` | LoongArch 64-bit | little | Port to the Loongson LoongArch 64-bit architecture. |
+| `m68k` | Motorola 68k | big | Port to the Motorola 68k series — Sun3 workstations, Apple Macintosh, Atari and Amiga. |
+| `powerpc` | PowerPC 32-bit | big | Port for Apple PowerMac, CHRP and PReP machines. |
+| `ppc64` | PowerPC 64-bit | big | Port for 64-bit PowerPC systems. |
+| `riscv64` | RISC-V 64-bit | little | Port to the open-source RISC-V 64-bit architecture. |
+| `sh4` | SuperH | little | Port to Hitachi SuperH processors and the open-source J-Core processor. |
+| `sparc64` | SPARC 64-bit | big | Port to Sun's 64-bit SPARC architecture. |
 
-## Source of Images
+All images target Debian `sid` (unstable) via [deb.debian.org/debian-ports](https://deb.debian.org/debian-ports).
 
-The images provided in this repository are sourced from [Debian other ports](https://www.debian.org/ports/#portlist-other).
+## Source
 
-## Original Project
+Images are built from [Debian other ports](https://www.debian.org/ports/#portlist-other) using [`debootstrap`](https://wiki.debian.org/Debootstrap) and scripts derived from [moby/moby](https://github.com/moby/moby/tree/master/contrib).
 
-This project is based on [multiarch/debian-debootstrap](https://github.com/multiarch/debian-debootstrap), which supports a wide range of other architectures.
+This project is based on [multiarch/debian-debootstrap](https://github.com/multiarch/debian-debootstrap).
 
 ## License
 
