@@ -43,7 +43,6 @@ Example tags: `m68k-trixie-sid`, `m68k-trixie-sid-slim`
 | `m68k` | Motorola 68k | big | Port to the Motorola 68k series — Sun3 workstations, Apple Macintosh, Atari and Amiga. |
 | `powerpc` | PowerPC 32-bit | big | Port for Apple PowerMac, CHRP and PReP machines. |
 | `ppc64` | PowerPC 64-bit | big | Port for 64-bit PowerPC systems. |
-| `riscv64` | RISC-V 64-bit | little | Port to the open-source RISC-V 64-bit architecture. |
 | `sh4` | SuperH | little | Port to Hitachi SuperH processors and the open-source J-Core processor. |
 | `sparc64` | SPARC 64-bit | big | Port to Sun's 64-bit SPARC architecture. |
 
