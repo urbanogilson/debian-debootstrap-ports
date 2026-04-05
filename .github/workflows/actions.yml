@@ -26,44 +26,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        VERSION: [sid]
         include:
-          - ARCH: alpha
-            QEMU_ARCH: alpha
-            UNAME_ARCH: alpha
-            CONTAINER_ARCH: alpha
-          - ARCH: hppa
-            QEMU_ARCH: hppa
-            UNAME_ARCH: hppa
-            CONTAINER_ARCH: hppa
-          - ARCH: loong64
-            QEMU_ARCH: loongarch64
-            UNAME_ARCH: loong64
-            CONTAINER_ARCH: loong64
-          - ARCH: m68k
-            QEMU_ARCH: m68k
-            UNAME_ARCH: m68k
-            CONTAINER_ARCH: m68k
-          - ARCH: powerpc
-            QEMU_ARCH: ppc
-            UNAME_ARCH: powerpc
-            CONTAINER_ARCH: ppc
-          - ARCH: ppc64
-            QEMU_ARCH: ppc64
-            UNAME_ARCH: ppc64
-            CONTAINER_ARCH: ppc64
-          - ARCH: riscv64
-            QEMU_ARCH: riscv64
-            UNAME_ARCH: riscv64
-            CONTAINER_ARCH: riscv64
-          - ARCH: sh4
-            QEMU_ARCH: sh4
-            UNAME_ARCH: sh4
-            CONTAINER_ARCH: sh4
-          - ARCH: sparc64
-            QEMU_ARCH: sparc64
-            UNAME_ARCH: sparc64
-            CONTAINER_ARCH: sparc64
+          - {ARCH: alpha,   QEMU_ARCH: alpha,       UNAME_ARCH: alpha,   CONTAINER_ARCH: alpha,   VERSION: sid}
+          - {ARCH: hppa,    QEMU_ARCH: hppa,        UNAME_ARCH: hppa,    CONTAINER_ARCH: hppa,    VERSION: sid}
+          - {ARCH: loong64, QEMU_ARCH: loongarch64, UNAME_ARCH: loong64, CONTAINER_ARCH: loong64, VERSION: sid}
+          - {ARCH: m68k,    QEMU_ARCH: m68k,        UNAME_ARCH: m68k,    CONTAINER_ARCH: m68k,    VERSION: sid}
+          - {ARCH: powerpc, QEMU_ARCH: ppc,         UNAME_ARCH: powerpc, CONTAINER_ARCH: ppc,     VERSION: sid}
+          - {ARCH: ppc64,   QEMU_ARCH: ppc64,       UNAME_ARCH: ppc64,   CONTAINER_ARCH: ppc64,   VERSION: sid}
+          - {ARCH: riscv64, QEMU_ARCH: riscv64,     UNAME_ARCH: riscv64, CONTAINER_ARCH: riscv64, VERSION: sid}
+          - {ARCH: sh4,     QEMU_ARCH: sh4,         UNAME_ARCH: sh4,     CONTAINER_ARCH: sh4,     VERSION: sid}
+          - {ARCH: sparc64, QEMU_ARCH: sparc64,     UNAME_ARCH: sparc64, CONTAINER_ARCH: sparc64, VERSION: sid}
 
     steps:
       - name: Checkout repository
